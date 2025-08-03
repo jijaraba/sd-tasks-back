@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sd-tasks-postgres-dev
+    environment:
+      POSTGRES_DB: sd_tasks_db
+      POSTGRES_USER: sd_tasks_user
+      POSTGRES_PASSWORD: sd_tasks_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - sd-tasks-network-dev
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      target: builder
+    container_name: sd-tasks-backend-dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      DATABASE_URL: postgresql://sd_tasks_user:sd_tasks_password@postgres:5432/sd_tasks_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - sd-tasks-network-dev
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    command: ["npm", "run", "dev:watch"]
+
+volumes:
+  postgres_data_dev:
+
+networks:
+  sd-tasks-network-dev:
+    driver: bridge
