@@ -11,7 +11,16 @@ dotenv.config();
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
-app.use(cors());
+// CORS configuration for production and development
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.com', 'http://localhost:8100', 'http://localhost:5173'] 
+    : ['http://localhost:8100', 'http://localhost:5173', 'http://10.0.2.2:8100'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

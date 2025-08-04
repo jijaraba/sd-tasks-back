@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDB = exports.sequelize = void 0;
 const sequelize_1 = require("sequelize");
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://sd_tasks_user:sd_tasks_password@localhost:5432/sd_tasks_db';
+// Support both DATABASE_URL (single URL) and individual environment variables
+const DATABASE_URL = process.env.DATABASE_URL ||
+    `postgresql://${process.env.DB_USER || 'sd_tasks_user'}:${process.env.DB_PASSWORD || 'sd_tasks_password'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'sd_tasks_db'}`;
 const sequelize = new sequelize_1.Sequelize(DATABASE_URL, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
@@ -13,10 +15,8 @@ const sequelize = new sequelize_1.Sequelize(DATABASE_URL, {
         idle: 10000
     },
     dialectOptions: {
-        ssl: process.env.NODE_ENV === 'production' ? {
-            require: true,
-            rejectUnauthorized: false
-        } : false
+        // Enable SSL for production (Render), disable for local development
+        ssl: process.env.NODE_ENV === 'production' ? { require: true, rejectUnauthorized: false } : false
     }
 });
 exports.sequelize = sequelize;

@@ -12,7 +12,15 @@ const tasks_1 = __importDefault(require("./routes/tasks"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = parseInt(process.env.PORT || '3000', 10);
-app.use((0, cors_1.default)());
+// CORS configuration for production and development
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://your-frontend-domain.com', 'http://localhost:8100', 'http://localhost:5173']
+        : ['http://localhost:8100', 'http://localhost:5173', 'http://10.0.2.2:8100'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
