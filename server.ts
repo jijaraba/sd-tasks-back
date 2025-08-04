@@ -14,10 +14,34 @@ const PORT: number = parseInt(process.env.PORT || '3000', 10);
 // CORS configuration for production and development
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.com', 'http://localhost:8100', 'http://localhost:5173'] 
-    : ['http://localhost:8100', 'http://localhost:5173', 'http://10.0.2.2:8100'],
+    ? [
+        // Production frontend domains
+        'https://your-frontend-domain.com',
+        // Development and testing
+        'http://localhost:8100', 
+        'http://localhost:5173',
+        'http://10.0.2.2:8100',
+        // Capacitor mobile apps
+        'https://localhost',
+        'http://localhost',
+        'capacitor://localhost',
+        'ionic://localhost'
+      ]
+    : [
+        // Development origins
+        'http://localhost:8100', 
+        'http://localhost:5173', 
+        'http://10.0.2.2:8100',
+        // Capacitor mobile apps (all environments)
+        'https://localhost',
+        'http://localhost', 
+        'capacitor://localhost',
+        'ionic://localhost'
+      ],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
